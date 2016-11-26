@@ -24,6 +24,7 @@ import re
 import sys
 import urllib
 import urllib2
+import ssl
 import traceback
 import cookielib
 from htmlentitydefs import name2codepoint as n2cp
@@ -43,6 +44,7 @@ _cookie_jar = None
 
 CACHE_COOKIES = 'cookies'
 
+sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
 
 class _StringCookieJar(cookielib.LWPCookieJar):
 
@@ -82,7 +84,7 @@ def request(url, headers={}):
     req = urllib2.Request(url, headers=headers)
     req.add_header('User-Agent', UA)
     try:
-        response = urllib2.urlopen(req)
+        response = urllib2.urlopen(req, context=sslcontext)
         data = response.read()
         response.close()
     except urllib2.HTTPError, error:
@@ -97,7 +99,7 @@ def post(url, data, headers={}):
     req = urllib2.Request(url, postdata, headers)
     req.add_header('User-Agent', UA)
     try:
-        response = urllib2.urlopen(req)
+        response = urllib2.urlopen(req, context=sslcontext)
         data = response.read()
         response.close()
     except urllib2.HTTPError, error:
@@ -111,7 +113,7 @@ def post_json(url, data, headers={}):
     headers['Content-Type'] = 'application/json'
     req = urllib2.Request(url, postdata, headers)
     req.add_header('User-Agent', UA)
-    response = urllib2.urlopen(req)
+    response = urllib2.urlopen(req, context=sslcontext)
     data = response.read()
     response.close()
     return data
